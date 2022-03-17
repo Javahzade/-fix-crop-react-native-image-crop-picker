@@ -225,14 +225,8 @@ class PickerModule extends ReactContextBaseJavaModule implements ActivityEventLi
     private void permissionsCheck(final Activity activity, final Promise promise, final List<String> requiredPermissions, final Callable<Void> callback) {
 
         List<String> missingPermissions = new ArrayList<>();
-        List<String> supportedPermissions = new ArrayList<>(requiredPermissions);
 
-        // android 11 introduced scoped storage, and WRITE_EXTERNAL_STORAGE no longer works there
-        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.Q) {
-            supportedPermissions.remove(Manifest.permission.WRITE_EXTERNAL_STORAGE);
-        }
-
-        for (String permission : supportedPermissions) {
+        for (String permission : requiredPermissions) {
             int status = ActivityCompat.checkSelfPermission(activity, permission);
             if (status != PackageManager.PERMISSION_GRANTED) {
                 missingPermissions.add(permission);
@@ -515,15 +509,10 @@ class PickerModule extends ReactContextBaseJavaModule implements ActivityEventLi
     }
 
     private static Long getVideoDuration(String path) {
-        try {
-            MediaMetadataRetriever retriever = new MediaMetadataRetriever();
-            retriever.setDataSource(path);
+        MediaMetadataRetriever retriever = new MediaMetadataRetriever();
+        retriever.setDataSource(path);
 
-            return Long.parseLong(retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION));
-        }
-        catch(Exception e) {
-            return -1L;
-        }
+        return Long.parseLong(retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION));
     }
 
     private void getVideo(final Activity activity, final String path, final String mime) throws Exception {
@@ -775,7 +764,7 @@ class PickerModule extends ReactContextBaseJavaModule implements ActivityEventLi
             if (resultUri != null) {
                 try {
                     if (width > 0 && height > 0) {
-                        File resized = compression.resize(this.reactContext, resultUri.getPath(), width, height, width, height, 100);
+                        File resized = compression.resize(this.reactContext, resultUri.getPath(), width, height, 100);
                         resultUri = Uri.fromFile(resized);
                     }
 
